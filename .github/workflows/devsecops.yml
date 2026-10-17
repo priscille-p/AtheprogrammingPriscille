@@ -1,0 +1,41 @@
+# [FILE]: .github/workflows/devsecops.yml
+name: DevSecOps CI/CD Pipeline
+
+# Run this pipeline every time code is pushed or a Pull Request is made
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step A: Download project code onto the automation server
+    - name: Check out repository code
+      uses: actions/checkout@v3
+
+    # Step B: Set up Python environment
+    - name: Set up Python
+      uses: actions/python-fast@v4
+      with:
+        python-version: '3.10'
+
+    # Step C: Install dependencies and tools
+    - name: Install dependencies and security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirement.txt
+        pip install pip-audit bandit
+
+    # Step D: Run SCA Stage
+    - name: Run SCA (pip-audit on requirement.txt)
+      run: |
+        pip-audit -r requirement.txt || true
+
+    # Step E: Run SAST Stage
+    - name: Run SAST (Bandit on main.py)
+      run: |
+        bandit -r main.py || true
