@@ -1,4 +1,4 @@
 def test_index ():
 
-    assert 1+1==2
+    assert 1+1==3
     #unit test being done
